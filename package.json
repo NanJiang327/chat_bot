@@ -1,0 +1,27 @@
+{
+  "name": "bank_bot",
+  "version": "1.0.0",
+  "description": "this is a bank bot made by nan jiang for msa assessment",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NanJiang327/bank_bot.git"
+  },
+  "keywords": [
+    "bank_bot"
+  ],
+  "author": "NAN JIANG",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NanJiang327/bank_bot/issues"
+  },
+  "homepage": "https://github.com/NanJiang327/bank_bot#readme",
+  "dependencies": {
+    "botbuilder": "^3.12.0",
+    "nodemo": "^1.0.0",
+    "restify": "^6.3.4"
+  }
+}
