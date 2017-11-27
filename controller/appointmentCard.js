@@ -10,7 +10,7 @@ var url = 'http://njmsabankbot.azurewebsites.net/tables/Appointments';
 	function handleAppointmentsResponse(message, session, username) {
         // Parase JSON
 		var appointmentsResponse = JSON.parse(message);
-		var allAppointments = [];
+		var allAppointmentCards = [];
 		for (var index in appointmentsResponse) {
 			var usernameReceived = appointmentsResponse[index].username;
             var branch = appointmentsResponse[index].branch;
@@ -18,61 +18,63 @@ var url = 'http://njmsabankbot.azurewebsites.net/tables/Appointments';
 
 			//Convert the username to lower cases
 			if (username.toLowerCase() === usernameReceived.toLowerCase()) {
-                rest.getAppointments(url, session, username, branch, time, displayAppointmentCards);
+			   var AppointmentNumber = parseFloat(index) + 1;
+			   var appointmentCard = {
+				contentType: "application/vnd.microsoft.card.adaptive",
+				content: {
+					"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+					"type": "AdaptiveCard",
+					"version": "1.0",
+					"body": [
+						{
+							"type": "Container",
+							"items": [
+								{
+									"type": "TextBlock",
+									"text": "Appointment "+AppointmentNumber+"",
+									"size": "large"
+								},
+								{
+									"type": "TextBlock",
+									"text": "Appointment Information"
+								}
+							]
+						},
+						{
+							"type": "Container",
+							"spacing": "none",
+							"items": [
+								{
+									"type": "ColumnSet",
+									"columns": [
+										{
+											"type": "Column",
+											"width": "auto",
+											"items": [
+												{
+													"type": "TextBlock",
+													"text": "Branch: "+branch+"",
+												},
+												{
+													"type": "TextBlock",
+													"text": "Date: "+time+"",
+												},
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			};
+				allAppointmentCards.push(appointmentCard);
 			}
 		}
+		var cards = new builder.Message(session)
+			.attachmentLayout(builder.AttachmentLayout.carousel)
+			.attachments(allAppointmentCards);
+		session.send(cards);	
+		
     }
     
-    function displayAppointmentCards(message, username, branch, time, session){
-        // Parase JSON
-		var appointmentsResponse = JSON.parse(message);
-		var appointmentCards = [];
-		
-		var appointmentCard = new builder.Message(session).addAttachment({
-			contentType: "application/vnd.microsoft.card.adaptive",
-			content: {
-				"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-				"type": "AdaptiveCard",
-				"version": "1.0",
-				"body": [
-					{
-						"type": "Container",
-						"items": [
-							{
-								"type": "TextBlock",
-								"text": Appointment,
-								"size": "large"
-							},
-							{
-								"type": "TextBlock",
-								"text": "Appointment Information"
-							}
-						]
-					},
-					{
-						"type": "Container",
-						"spacing": "none",
-						"items": [
-							{
-								"type": "ColumnSet",
-								"columns": [
-									{
-										"type": "Column",
-										"width": "auto",
-										"items": [
-											{
-												"type": "TextBlock",
-												"text": branch,
-												"text": time
-											}
-										]
-									}
-								]
-							}
-						]
-					}
-				]
-			}
-		});
-		session.send(appointmentCard);
-	}	

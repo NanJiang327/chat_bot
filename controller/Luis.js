@@ -27,7 +27,7 @@ exports.startDialog = function (bot) {
 				}
 
 				session.send("Retrieving your appointments");
-				appointmentCard.getAppointments(session, session.conversationData["username"]); 
+				appointmentCard.getAppointments(session.conversationData["username"],session); 
 			}
 		}
     ]).triggerAction({
