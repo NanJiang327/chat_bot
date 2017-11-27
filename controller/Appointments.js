@@ -26,5 +26,23 @@ exports.deleteAppointment = function deleteAppointment(session,username){
 };
 
 exports.makeAppointment = function makeAppointment(session, username, place, time){
-	rest.makeAppointment(url, username, place, time);
+	rest.getAppointments(url, session, username, function(message,seesion,username){
+		var exist = false;
+		var allAppointments = JSON.parse(message);
+		for(var i in allAppointments){
+			if(allAppointments[i].time === time){
+				exist = true;
+				break;
+			}else{
+				exist = false;
+			}
+		}
+		if(exist){
+			session.send("Sorry. You already have an appointment at %s", time);
+		}else{
+			session.send('Appointment at %s at %s has been made', place, time);
+			rest.makeAppointment(url, username, place, time);			
+		}
+
+	});
 };

@@ -63,17 +63,15 @@ exports.startDialog = function (bot) {
                 // Pulls out the place entity from the session if it exists
                 var place = builder.EntityRecognizer.findEntity(session.dialogData.args.intent.entities, 'place');
 
-                // Checks if the food entity was found
+                // Checks if the time and place entity was found
                 if (time.entity&&place.entity) {
-                    
+                
                     if(place.entity === "branch 1"){
                         if(checkDate(time,session)){
-                            console.log("---%s&&%s---",place.entity,time.entity);
-                            session.send('Appointment at %s at %s has been made', place.entity, timeNoSpace);
                             appointment.makeAppointment(session, session.conversationData["username"], place.entity, timeNoSpace);
                         }
                     }else{
-                        session.send("Can only make appointments at \'branch 1\'");
+                        session.send("Can only make appointments at \'branch 1\' at the moment");
                     }
                 } else {
                     session.send("No branch or time identified");
@@ -94,7 +92,6 @@ function isAttachment(session) {
         return true;
     }
     else {
-        console.log("----attachment false.----");
         return false;
     }
 }
@@ -120,7 +117,7 @@ function checkDate(time,session){
         if(selectedDate > today){
             return true;
         }else{
-            session.send("Can only appointments for the future");
+            session.send("Can only make appointments for the future");
             return false;       
         }
     }    
