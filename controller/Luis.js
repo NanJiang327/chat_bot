@@ -132,7 +132,70 @@ exports.startDialog = function (bot) {
     bot.dialog('QnA', [
         function (session, args, next) {
             session.dialogData.args = args || {};
-            builder.Prompts.text(session, "What is your question?");
+            builder.Prompts.text(session, new builder.Message(session).addAttachment({
+				contentType: "application/vnd.microsoft.card.adaptive",
+				content: {
+                    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                    "type": "AdaptiveCard",
+                    "version": "1.0",
+                    "body": [
+                    {
+                        "type": "ColumnSet",
+                        "columns": [
+                        
+                        {
+                            "type": "Column",
+                            "width": 2,
+                            "items": [
+                            {
+                                "type": "TextBlock",
+                                "text": "How can I help you today?",
+                                "weight": "bolder",
+                                "size": "medium"
+                            },
+                            {
+                                "type": "TextBlock",
+                                "text": "You can ask:",
+                                "isSubtle": true,
+                                "wrap": true,
+                                "size": "small"
+                            },
+                            {
+                                "type": "TextBlock",
+                                "text": "where is the branch 1?",
+                                "isSubtle": true,
+                                "wrap": true,
+                                "size": "small"
+                            },
+                            {
+                                "type": "TextBlock",
+                                "text": "how many branchs in auckland?",
+                                "isSubtle": true,
+                                "wrap": true,
+                                "size": "small"
+                            },
+                            {
+                                "type": "TextBlock",
+                                "text": "what can I do in the chat bot?",
+                                "isSubtle": true,
+                                "wrap": true,
+                                "size": "small"
+                            },
+                            {
+                                "type": "TextBlock",
+                                "text": "I want to know more informations",
+                                "isSubtle": true,
+                                "wrap": true,
+                                "size": "small"
+                            }
+                            
+                            ]
+                        }
+                        ]
+                    }
+                    ]
+                }
+              }));
         },
         function (session, results, next) {
             qna.talkToQnA(session, results.response);
