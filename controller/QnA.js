@@ -1,3 +1,8 @@
+/*
+* @Project name: MSA Contoso Chat Bot
+* @Author: Nan Jiang
+*/
+
 var rest = require('../API/Restclient');
 
 exports.talkToQnA = function postQnAResults(session, question){

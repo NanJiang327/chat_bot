@@ -1,8 +1,14 @@
+/*
+* @Project name: MSA Contoso Chat Bot
+* @Author: Nan Jiang
+*/
+
 var builder = require('botbuilder');
 var customVision = require('./CustomVision');
 var appointment = require('./Appointments');
 var appointmentCard = require('./appointmentCard');
 var qna = require('./QnA');
+var currency = require('./currencyCard');
 
 exports.startDialog = function (bot) {
 
@@ -12,13 +18,14 @@ exports.startDialog = function (bot) {
 
     bot.dialog('GetAppointment', [
         function (session, args, next) {
+            if(!isAttachment(session)){
 			session.dialogData.args = args || {};
 			if (!session.conversationData["username"]) {
 				builder.Prompts.text(session, "Enter a username to get your appointments.");
             }else {
 				next(); // Skip if we already have this info.
 			}
-		},
+		}},
 		function (session, results, next) {
 			if (!isAttachment(session)) {
 
@@ -49,19 +56,19 @@ exports.startDialog = function (bot) {
                 if (results.response) {
                         session.conversationData["username"] = results.response;
                 }
-           
-                session.send("You want to delete one of your favourite foods.");
+
+                // Pulls out the time entity from the session if it exists
+                var time = builder.EntityRecognizer.findEntity(session.dialogData.args.intent.entities, 'time');
             
-                // Pulls out the food entity from the session if it exists
-                var foodEntity = builder.EntityRecognizer.findEntity(session.dialogData.args.intent.entities, 'food');
-            
-                // Checks if the for entity was found
-                if (foodEntity) {
-                    session.send('Deleting \'%s\'...', foodEntity.entity)
-    
-                    food.deleteFavouriteFood(session,session.conversationData['username'],foodEntity.entity); //<--- CALLL WE WANT
+                // Checks if the time entity was found
+                if (time.entity) {
+                    session.send('Deleting \'%s\'...', time.entity)
+                    //Check data format and availability
+                    if(checkDate(time,session)){;
+                        appointment.deleteAppointment(session,session.conversationData['username'],foodEntity.entity);
+                    }
                 } else {
-                     session.send("No food identified! Please try again");
+                     session.send("Sorry. No appiontment at this time.");
                 }
              }
     }]).triggerAction({
@@ -109,6 +116,16 @@ exports.startDialog = function (bot) {
     ]).triggerAction({
         matches: 'AddAppointment'
     });
+
+    bot.dialog('GetCurrency', function (session, args) {
+        if (!isAttachment(session)) {
+            session.send('Retriving currency data..');
+            currency.displayCurrencyCards(session);
+        }
+    }).triggerAction({
+        matches: 'GetCurrency'
+    });
+
 
     bot.dialog('WelcomeIntent', [
         // Insert logic here later

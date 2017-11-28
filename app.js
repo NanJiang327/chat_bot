@@ -1,3 +1,8 @@
+/*
+* @Project name: MSA Contoso Chat Bot
+* @Author: Nan Jiang
+*/
+
 var restify =  require('restify');
 var builder = require('botbuilder');
 var luis = require('./controller/Luis');
@@ -51,7 +56,8 @@ bot.on('conversationUpdate', function (message) {
                                                         {
                                                             "type": "Image",
                                                             "url": "https://avatars3.githubusercontent.com/u/6422482?s=400&v=4",
-                                                            "size": "small",
+                                                            "size": "medium",
+                                                            "horizontalAlignment":"center",
                                                             "style": "person"
                                                         }
                                                     ]
@@ -67,7 +73,8 @@ bot.on('conversationUpdate', function (message) {
                                         {
                                             "type": "TextBlock",
                                             "text": "Welcome to Contoso Bank Chat bot!",
-                                            "size": "medium",
+                                            "size": "large",
+                                            "weight":"bolder",
                                             "wrap": true
                                         },
                                         {
@@ -77,7 +84,12 @@ bot.on('conversationUpdate', function (message) {
                                         },
                                         {
                                             "type": "TextBlock",
-                                            "text": "You can copy the img url of a currency to check the type of currency",
+                                            "text": "You can enter an img url of a currency to check the type of currency",
+                                            "wrap": true
+                                        },
+                                        {
+                                            "type": "TextBlock",
+                                            "text": "You can type \"currency rate\" to check currency",
                                             "wrap": true
                                         }
                                     ]

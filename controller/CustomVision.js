@@ -1,3 +1,8 @@
+/*
+* @Project name: MSA Contoso Chat Bot
+* @Author: Nan Jiang
+*/
+
 var request = require('request'); //node module for http post requests
 
 exports.retreiveMessage = function (session){
