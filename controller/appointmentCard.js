@@ -1,50 +1,96 @@
 var rest = require('../API/RestClient');
 var builder = require('botbuilder');
+var request = require('request');
 var url = 'http://njmsabankbot.azurewebsites.net/tables/Appointments';
+var we = '';
 
 	exports.getAppointments = function getAppointments(session, username){
-        
+		var weatherUrl = "http://api.apixu.com/v1/forecast.json?key=4afdc4ed6cc64789bbd223959172711 &q=Auckland&days=7"
+		rest.getWeatherForecast(weatherUrl,session,handleWeatherInfoResponse);
 		rest.getAppointments(url, session, username, handleAppointmentsResponse);
-	};
 
+	}
+
+	function handleWeatherInfoResponse(message){
+		we = message;
+		//console.log('-==%s==-',we);
+
+	}
 	function handleAppointmentsResponse(message, session, username) {
-        // Parase JSON
+		// Parase JSON
 		var appointmentsResponse = JSON.parse(message);
 		var allAppointmentCards = [];
 		var AppointmentNumber = 0;
+		//var weatherResponse = JSON.parse(weatherInfo);
+		var weatherInfoList = [];
+		
+		//console.log('-==%s==-',we);
+
 		for (var index in appointmentsResponse) {
 			var usernameReceived = appointmentsResponse[index].username;
             var branch = appointmentsResponse[index].branch;
 			var time = appointmentsResponse[index].time;
-			
 			//Convert the username to lower cases
-			if (username.toLowerCase() === usernameReceived.toLowerCase()&&checkDate(time,session)) {
-			    AppointmentNumber += 1;
-				var appointmentCard = {
-				contentType: "application/vnd.microsoft.card.adaptive",
-				content: {
-					"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-					"type": "AdaptiveCard",
-					"version": "1.0",
-					"body": [
-						{
-							"type": "Container",
-							"items": [
+			if (username.toLowerCase() === usernameReceived.toLowerCase()&&checkDate(time)) {
+				AppointmentNumber += 1;
+				if(checkIfWithinSevenDays(time)){
+					var appointmentCard = {
+						contentType: "application/vnd.microsoft.card.adaptive",
+						content: {
+							"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+							"backgroundImage": "http://www.pptback.com/backgrounds/abstract-cartoon-cloud-art-backgrounds-powerpoint.jpg",
+							"type": "AdaptiveCard",
+							"version": "1.0",
+							"body": [
 								{
+									"type": "Container",
+									"items": [
+										{
+											"type": "TextBlock",
+											"text": "Appointment "+AppointmentNumber+"",
+											"size": "large"
+										},
+										{
+											"type": "TextBlock",
+											"text": "Appointment Information"
+										}
+									]
+								},
+								{
+									"type": "Container",
+									"spacing": "none",
+									"items": [
+										{
+											"type": "FactSet",
+											"facts": [
+												{
+													"title": "User: ",
+													"value": username
+												},
+												{
+													"title": "Branch: ",
+													"value": branch
+												},
+												{
+													"title": "Date: ",
+													"value": time
+												}
+											]
+										}
+									]
+								},
+								{
+									"separator": true,
 									"type": "TextBlock",
-									"text": "Appointment "+AppointmentNumber+"",
-									"size": "large"
+									"text": "Seattle, WA",
+									"size": "large",
+									"isSubtle": true
 								},
 								{
 									"type": "TextBlock",
-									"text": "Appointment Information"
-								}
-							]
-						},
-						{
-							"type": "Container",
-							"spacing": "none",
-							"items": [
+									"text": "September 18, 7:30 AM",
+									"spacing": "none"
+								},
 								{
 									"type": "ColumnSet",
 									"columns": [
@@ -53,20 +99,84 @@ var url = 'http://njmsabankbot.azurewebsites.net/tables/Appointments';
 											"width": "auto",
 											"items": [
 												{
-													"type": "TextBlock",
-													"text": "Branch: "+branch+"",
-												},
+													"type": "Image",
+													"url": "http://messagecardplayground.azurewebsites.net/assets/Mostly%20Cloudy-Square.png",
+													"size": "small"
+												}
+											]
+										},
+										{
+											"type": "Column",
+											"width": "auto",
+											"items": [
 												{
 													"type": "TextBlock",
-													"text": "Date: "+time+"",
-												},
-											]
+													"text": "42°C",
+													"size": "extraLarge",
+													"spacing": "none"
+												}]
 										}
 									]
 								}
 							]
 						}
-					]
+				}
+
+				}else{
+					var appointmentCard = {
+						contentType: "application/vnd.microsoft.card.adaptive",
+						content: {
+							"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+							"backgroundImage": "http://www.pptback.com/backgrounds/abstract-cartoon-cloud-art-backgrounds-powerpoint.jpg",
+							"type": "AdaptiveCard",
+							"version": "1.0",
+							"body": [
+								{
+									"type": "Container",
+									"items": [
+										{
+											"type": "TextBlock",
+											"text": "Appointment "+AppointmentNumber+"",
+											"size": "large"
+										},
+										{
+											"type": "TextBlock",
+											"text": "Appointment Information"
+										}
+									]
+								},
+								{
+									"type": "Container",
+									"spacing": "none",
+									"items": [
+										{
+											"type": "FactSet",
+											"facts": [
+												{
+													"title": "User: ",
+													"value": username
+												},
+												{
+													"title": "Branch: ",
+													"value": branch,
+												},
+												{
+													"title": "Date: ",
+													"value": time,
+												}
+											]
+										}
+									]
+								},
+								{
+									"separator": true,
+									"type": "TextBlock",
+									"text": "Weather service only availabe within 7 days",
+									"size": "medium",
+									"isSubtle": true
+								},
+							]
+						}
 				}
 			};
 				allAppointmentCards.push(appointmentCard);
@@ -84,28 +194,29 @@ var url = 'http://njmsabankbot.azurewebsites.net/tables/Appointments';
 		
 		
 	}
-	
 	//Method used to check the date
-function checkDate(time,session){
-    //reg for time slot
-    var timeValidator = /((^((1[8-9]\d{2})|([2-9]\d{3}))(-)(10|12|0?[13578])(-)(3[01]|[12][0-9]|0?[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(11|0?[469])(-)(30|[12][0-9]|0?[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(0?2)(-)(2[0-8]|1[0-9]|0?[1-9])$)|(^([2468][048]00)(-)(0?2)(-)(29)$)|(^([3579][26]00)(-)(0?2)(-)(29)$)|(^([1][89][0][48])(-)(0?2)(-)(29)$)|(^([2-9][0-9][0][48])(-)(0?2)(-)(29)$)|(^([1][89][2468][048])(-)(0?2)(-)(29)$)|(^([2-9][0-9][2468][048])(-)(0?2)(-)(29)$)|(^([1][89][13579][26])(-)(0?2)(-)(29)$)|(^([2-9][0-9][13579][26])(-)(0?2)(-)(29)$))/;
-    //remove space in time
-    timeNoSpace = time.replace(/\s/g, "");
-    var result = timeNoSpace.match(timeValidator);
+function checkDate(time){
+    var today = new Date();
+    var selectedDate =new Date(time.replace(/-/g,"/")); 
+	// Check the date is futur or not
+	var result = selectedDate - today;
+     if(selectedDate > today){
+         return true;
+     }else{
+          return false;       
+	 } 
+}
 
-    // Check date format
-    if(result == null){
-        session.send("The time format should be \"2017-11-27\"");
-        return false;
-    }else{
-        var today = new Date();
-        var selectedDate =new Date(timeNoSpace.replace(/-/g,"/")); 
-        // Check the date is futur or not
-        if(selectedDate > today){
-            return true;
-        }else{
-            return false;       
-        }
-    }    
+function checkIfWithinSevenDays(time){
+	var today = new Date();
+	var selectedDate =new Date(time.replace(/-/g,"/")); 
+	// Check the date is futur or not
+	var result = selectedDate - today;
+	//Check the time difference in millisecond
+	if(result <= 604800000){
+		return true;
+	}else{
+		return false;       
+	} 
 }
     

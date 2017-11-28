@@ -57,14 +57,23 @@ exports.makeAppointment = function SendData(url, username, branch, time){
       });
 };
 
+exports.getWeatherForecast = function getData(url,session, callback){
+    request.get(url, function(err,res,body){
+        if(err){
+            console.log(err);
+        }else {
+            callback(body, session);
+        }
+    });
+}
+
 //request QnA
 exports.postQnAResults = function getData(url, session, question, callback){
     var options = {
         url: url,
         method: 'POST',
         headers: {
-            //todo
-            'Ocp-Apim-Subscription-Key': '',
+            'Ocp-Apim-Subscription-Key': '6864ab085d7844118e02efb7c931e500',
             'Content-Type':'application/json'
         },
         json: {

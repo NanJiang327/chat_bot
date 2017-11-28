@@ -16,7 +16,7 @@ exports.startDialog = function (bot) {
 			if (!session.conversationData["username"]) {
 				builder.Prompts.text(session, "Enter a username to get your appointments.");
             }else {
-				next(); // Skip username already exsit.
+				next(); // Skip if we already have this info.
 			}
 		},
 		function (session, results, next) {
@@ -27,18 +27,44 @@ exports.startDialog = function (bot) {
 				}
 
 				session.send("Retrieving your appointments");
-				appointmentCard.getAppointments(session.conversationData["username"],session); 
+                appointmentCard.getAppointments(session.conversationData["username"],session); 
 			}
 		}
     ]).triggerAction({
         matches: 'GetAppointment'
     });
 
-    bot.dialog('DeleteAppointment', function (session, args){
-        if(!isAttachment(session)){
+    bot.dialog('DeleteAppointment', [
+        function (session, args, next){
+            if(!isAttachment(session)){
+                session.dialogData.args = args || {};
+                if (!session.conversationData["username"]) {
+                    builder.Prompts.text(session, "Enter a username first.");
+                } else {
+                    next(); // Skip if we already have this info.
+                }
+        }},
+        function (session, results,next) {
+            if (!isAttachment(session)) {
+                if (results.response) {
+                        session.conversationData["username"] = results.response;
+                }
+           
+                session.send("You want to delete one of your favourite foods.");
+            
+                // Pulls out the food entity from the session if it exists
+                var foodEntity = builder.EntityRecognizer.findEntity(session.dialogData.args.intent.entities, 'food');
+            
+                // Checks if the for entity was found
+                if (foodEntity) {
+                    session.send('Deleting \'%s\'...', foodEntity.entity)
     
-        }
-    }).triggerAction({
+                    food.deleteFavouriteFood(session,session.conversationData['username'],foodEntity.entity); //<--- CALLL WE WANT
+                } else {
+                     session.send("No food identified! Please try again");
+                }
+             }
+    }]).triggerAction({
         matches: 'DeleteAppointment'
     });
 
@@ -67,7 +93,7 @@ exports.startDialog = function (bot) {
                 if (time.entity&&place.entity) {
                 
                     if(place.entity === "branch 1"){
-                        if(checkDate(time,session)){
+                        if(checkDate(time,session)){;
                             appointment.makeAppointment(session, session.conversationData["username"], place.entity, timeNoSpace);
                         }
                     }else{
@@ -81,6 +107,40 @@ exports.startDialog = function (bot) {
     ]).triggerAction({
         matches: 'AddAppointment'
     });
+
+    bot.dialog('WelcomeIntent', [
+        // Insert logic here later
+        function (session, args, next) {
+			session.dialogData.args = args || {};
+			if (!session.conversationData["username"]) {
+				builder.Prompts.text(session, "Hi, please enter your name first.");
+			} else {
+				next(); // Skip if we already have this info.
+			}
+		},
+        function (session, results){
+
+            if (results.response) {
+                session.conversationData["username"] = results.response;
+            }
+            session.send("Hi, %s. What can I do for you today?", session.conversationData["username"]);
+        }
+    ]).triggerAction({
+        matches: 'WelcomeIntent'
+    });
+
+    bot.dialog('QnA', [
+        function (session, args, next) {
+            session.dialogData.args = args || {};
+            builder.Prompts.text(session, "What is your question?");
+        },
+        function (session, results, next) {
+            qna.talkToQnA(session, results.response);
+        }
+    ]).triggerAction({
+        matches: 'QnA'
+    });
+
     
 // Function is called when the user inputs an attachment
 function isAttachment(session) { 

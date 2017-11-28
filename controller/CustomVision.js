@@ -22,6 +22,6 @@ function validResponse(body){
     if (body && body.Predictions && body.Predictions[0].Tag){
         return "This is " + body.Predictions[0].Tag
     } else{
-        console.log('Sorry we did not recognize this image, please try another');
+        console.log('Sorry we did not recognize this url, please try another');
     }
 }
