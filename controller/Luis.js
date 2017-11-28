@@ -69,14 +69,16 @@ exports.startDialog = function (bot) {
     });
 
     bot.dialog('AddAppointment', [
+        
         function (session, args, next) {
-            session.dialogData.args = args || {};        
-            if (!session.conversationData["username"]) {
-                builder.Prompts.text(session, "Enter a username to make appointments.");                
-            } else {
-                next(); // Skip if we already have this info.
-            }
-        },
+            if(!isAttachment(session)){
+                session.dialogData.args = args || {};        
+                if (!session.conversationData["username"]) {
+                    builder.Prompts.text(session, "Enter a username to make appointments.");                
+                }else {
+                    next(); // Skip if we already have this info.
+                }
+            }},
         function (session, results, next) {
             if (!isAttachment(session)) {
 
@@ -209,12 +211,14 @@ exports.startDialog = function (bot) {
 function isAttachment(session) { 
     var msg = session.message.text;
     if ((session.message.attachments && session.message.attachments.length > 0) || msg.includes("http")) {
-        
+        builder.Prompts.text(session,"Can only recognize USD, AUD, NZD, GBP, EUP and CNY at the moment");
+        builder.Prompts.text(session,"Recognizing...");
         customVision.retreiveMessage(session);
         //call custom vision here later
         return true;
     }
     else {
+        console.log("----false----");
         return false;
     }
 }
@@ -225,7 +229,6 @@ function checkDate(time,session){
     var timeValidator = /((^((1[8-9]\d{2})|([2-9]\d{3}))(-)(10|12|0?[13578])(-)(3[01]|[12][0-9]|0?[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(11|0?[469])(-)(30|[12][0-9]|0?[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(0?2)(-)(2[0-8]|1[0-9]|0?[1-9])$)|(^([2468][048]00)(-)(0?2)(-)(29)$)|(^([3579][26]00)(-)(0?2)(-)(29)$)|(^([1][89][0][48])(-)(0?2)(-)(29)$)|(^([2-9][0-9][0][48])(-)(0?2)(-)(29)$)|(^([1][89][2468][048])(-)(0?2)(-)(29)$)|(^([2-9][0-9][2468][048])(-)(0?2)(-)(29)$)|(^([1][89][13579][26])(-)(0?2)(-)(29)$)|(^([2-9][0-9][13579][26])(-)(0?2)(-)(29)$))/;
     //remove space in time.entity
     timeNoSpace = time.entity.replace(/\s/g, "");
-    console.log('-=-=-%s-=-=',timeNoSpace);
     var result = timeNoSpace.match(timeValidator);
 
     // Check date format
