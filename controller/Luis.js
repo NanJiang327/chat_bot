@@ -138,6 +138,7 @@ exports.startDialog = function (bot) {
 				contentType: "application/vnd.microsoft.card.adaptive",
 				content: {
                     "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+					"backgroundImage": "https://i.pinimg.com/736x/df/0f/71/df0f710dccc57370c25fdb59b10311cd--free-iphone-wallpaper-wallpaper-for.jpg",
                     "type": "AdaptiveCard",
                     "version": "1.0",
                     "body": [
