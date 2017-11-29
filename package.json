@@ -2,7 +2,7 @@
   "name": "bank_bot",
   "version": "1.0.0",
   "description": "this is a bank bot made by nan jiang for msa assessment",
-  "main": "index.html",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -2,7 +2,6 @@
 * @Project name: MSA Contoso Chat Bot
 * @Author: Nan Jiang
 */
-
 var builder = require('botbuilder');
 var customVision = require('./CustomVision');
 var appointment = require('./Appointments');
@@ -28,13 +27,11 @@ exports.startDialog = function (bot) {
 		}},
 		function (session, results, next) {
 			if (!isAttachment(session)) {
-
 				if (results.response) {
 					session.conversationData["username"] = results.response;
 				}
-
 				session.send("Retrieving your appointments");
-                appointmentCard.getAppointments(session.conversationData["username"],session); 
+                appointmentCard.displayAppointments(session,session.conversationData["username"]); 
 			}
 		}
     ]).triggerAction({
