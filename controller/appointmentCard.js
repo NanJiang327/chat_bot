@@ -5,7 +5,7 @@
 var rest = require('../API/RestClient');
 var builder = require('botbuilder');
 var request = require('request');
-var url = 'http://contosobotnj.azurewebsites.net/tables/Appointments;
+var url = 'http://contosobotnj.azurewebsites.net/tables/Appointments';
 
 
 	exports.displayAppointments = function getAppointments(session, username){
