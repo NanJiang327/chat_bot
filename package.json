@@ -24,5 +24,7 @@
     "nodemo": "^1.0.0",
     "restify": "^6.3.4"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "chai": "^4.1.2"
+  }
 }

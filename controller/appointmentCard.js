@@ -229,4 +229,6 @@ function checkIfWithinSevenDays(time){
 		return false;       
 	} 
 }
-    
+	
+// used for unit test
+module.exports = checkDate;
