@@ -56,16 +56,17 @@ exports.startDialog = function (bot) {
 
                 // Pulls out the time entity from the session if it exists
                 var time = builder.EntityRecognizer.findEntity(session.dialogData.args.intent.entities, 'time');
-            
+                var branch = "branch 1";
+                var timeEntity = time.entity.replace(/\s/g, "");
                 // Checks if the time entity was found
                 if (time.entity) {
-                    session.send('Deleting \'%s\'...', time.entity)
+                    session.send('Deleting appointment at \'%s\'...', timeEntity);
                     //Check data format and availability
                     if(checkDate(time,session)){;
-                        appointment.deleteAppointment(session,session.conversationData['username']);
+                        appointment.deleteAppointment(session,session.conversationData['username'],timeEntity,branch);
                     }
                 } else {
-                     session.send("Sorry. No appiontment at this time.");
+                     session.send("Can not identify the time.");
                 }
              }
     }]).triggerAction({
@@ -178,13 +179,6 @@ exports.startDialog = function (bot) {
                             },
                             {
                                 "type": "TextBlock",
-                                "text": "where is the branch 1?",
-                                "isSubtle": true,
-                                "wrap": true,
-                                "size": "small"
-                            },
-                            {
-                                "type": "TextBlock",
                                 "text": "how many branchs in auckland?",
                                 "isSubtle": true,
                                 "wrap": true,
@@ -228,11 +222,9 @@ function isAttachment(session) {
         builder.Prompts.text(session,"Can only recognize USD, AUD, NZD, GBP, EUP and CNY at the moment");
         builder.Prompts.text(session,"Recognizing...");
         customVision.retreiveMessage(session);
-        //call custom vision here later
         return true;
     }
     else {
-        console.log("----false----");
         return false;
     }
 }
@@ -257,7 +249,7 @@ function checkDate(time,session){
         if(selectedDate > today){
             return true;
         }else{
-            session.send("Can only make appointments for the future");
+            session.send("Can only make/delete appointments for the future");
             return false;       
         }
     }    

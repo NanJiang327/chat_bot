@@ -6,27 +6,38 @@
 var rest = require('../API/RestClient');
 var url = 'http://contosobotnj.azurewebsites.net/tables/Appointments';
 
-exports.deleteAppointment = function deleteAppointment(session,username){
-	rest.getAppointments(url,session, username,function(message,session,username){
+exports.deleteAppointment = function deleteAppointment(session,username,time, found){
+	rest.getAppointmentsForDelete(url,session, username, time,function(message,session,username,time,found){
 		var allAppointments = JSON.parse(message);
+		var idFound;
 		for(var i in allAppointments) {
-			if (allAppointments[i].appointment === appointment && allAppointments[i].username === username) {
-
-				console.log(allAppointments[i]);
-	            rest.deleteFavouriteFood(url,session,username,appointment, allAppointments[i].id ,handleDeletedFoodResponse)
-				session.send("Appointment at %s at %s has been deleted", appointment.branch, appointment.time);
+			if (allAppointments[i].time === time && allAppointments[i].username === username) {
+				found = true;
+				idFound = allAppointments[i].id;
+				break;
+			}else{
+				found = false;
 			}
 		}
-	
-	
+		rest.checkAppointmentsExistForDelete(url, session, username, time, found, idFound,handleDeleteResponse);
 	});
 };
 
-exports.makeAppointment = function makeAppointment(session, username, branch, time){
+exports.makeAppointment = function makeAppointment(session, username,branch,  time){
 	var exist = false;
 	rest.checkAppointmentsExist(url, session, username, branch, time, exist, handleCheckAppointmentResponse);
 	
 };
+
+//used to handle delete response
+function handleDeleteResponse(message,session,username, time, found, idFound){
+	if(found){
+		rest.deleteAppointment(url,session,username,time,found,idFound,handleDeleteResponse);
+		session.send("Hi, %s. Appointment at %s has been deleted", username, time);
+	}else{
+		session.send("Sorry, %s. you don't have an appointment at this day", username);
+	}
+}
 
 //used to handle check appointment response
 function handleCheckAppointmentResponse(message, session, username,branch,time, exist){
