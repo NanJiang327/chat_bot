@@ -9,14 +9,14 @@ var luis = require('./controller/Luis');
 
 // Set up Restify server
 var server = restify.createServer();
-server.listen(process.env.port || process.env.PORT || 3978, function(){
+server.listen(process.env.port || process.env.PORT || 3980, function(){
     console.log('%s server created - listening to %s',server.name, server.url);
 });
 
 // Create connector for communicating with the bot framework
 var connector = new builder.ChatConnector({
-    appId:"164a8678-6987-4800-a789-293f3a3495fe",
-    appPassword:"ihdoKJK508:[;lieUHCC44~"
+    appId:"3c5a5ef7-4022-45eb-a166-4a51c5a76344",
+    appPassword:"vhRXO682*tggnmROEN66|#="
 });
 
 // Listen for messages from users

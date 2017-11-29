@@ -4,7 +4,7 @@
 */
 
 var rest = require('../API/RestClient');
-var url = 'http://contosobankbotnj.azurewebsites.net/tables/Appointments';
+var url = 'http://contosobotnj.azurewebsites.net/tables/Appointments';
 
 exports.deleteAppointment = function deleteAppointment(session,username){
 	rest.getAppointments(url,session, username,function(message,session,username){
