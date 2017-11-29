@@ -10,13 +10,11 @@ exports.deleteAppointment = function deleteAppointment(session,username){
 	rest.getAppointments(url,session, username,function(message,session,username){
 		var allAppointments = JSON.parse(message);
 		for(var i in allAppointments) {
-			console.log(username)
-			console.log(allAppointments[i].username === username)
 			if (allAppointments[i].appointment === appointment && allAppointments[i].username === username) {
 
 				console.log(allAppointments[i]);
 	            rest.deleteFavouriteFood(url,session,username,appointment, allAppointments[i].id ,handleDeletedFoodResponse)
-				session.send("Appointment at %s at %s has been delted", appointment.branch, appointment.time);
+				session.send("Appointment at %s at %s has been deleted", appointment.branch, appointment.time);
 			}
 		}
 	
@@ -24,23 +22,37 @@ exports.deleteAppointment = function deleteAppointment(session,username){
 	});
 };
 
-exports.makeAppointment = function makeAppointment(session, username, place, time){
+exports.makeAppointment = function makeAppointment(session, username, branch, time){
 	var exist = false;
-	rest.getAppointments(url, session, username, function(message,seesion,username){
-		var allAppointments = JSON.parse(message);
-		for(var i in allAppointments){
+	rest.checkAppointmentsExist(url, session, username, branch, time, exist, handleCheckAppointmentResponse);
+	
+};
+
+//used to handle check appointment response
+function handleCheckAppointmentResponse(message, session, username,branch,time, exist){
+	var allAppointments = JSON.parse(message);
+	for(var i in allAppointments){
+		var usernameReceived = allAppointments[i].username;
+		if(username.toLowerCase() === usernameReceived.toLowerCase()){
 			if(allAppointments[i].time === time){
 				exist = true;
 				break;
 			}else{
 				exist = false;
 			}
+		}else{
+			exist =false;
 		}
-	});
+	}
+	rest.checkAppointmentsExist(url,session,username,branch,time,exist,hanldeCheckAppointmentResult);
+}
+
+// use for handle the check response result
+function hanldeCheckAppointmentResult(message,session, username, branch, time, exist){
 	if(exist){
 		session.send("Sorry. You already have an appointment at %s", time);
 	}else{
-		session.send('Appointment for %s at %s at %s has been made',username, place, time);
-		rest.makeAppointment(url, username, place, time);			
+		session.send('Appointment for %s at %s at %s has been made',username, branch, time);
+		rest.makeAppointment(url, username, branch, time);			
 	}
-};
+}

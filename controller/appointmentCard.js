@@ -7,34 +7,50 @@ var builder = require('botbuilder');
 var request = require('request');
 var url = 'http://contosobotnj.azurewebsites.net/tables/Appointments';
 
-
 	exports.displayAppointments = function getAppointments(session, username){
-		var weatherUrl = "http://api.apixu.com/v1/forecast.json?key=4afdc4ed6cc64789bbd223959172711 &q=Auckland&days=7"
-	//	rest.getWeatherForecast(weatherUrl,session,handleWeatherInfoResponse);
-		rest.getAppointments(url, session, username, handleAppointmentsResponse);
-
+		var weatherUrl = "http://api.apixu.com/v1/forecast.json?key=4afdc4ed6cc64789bbd223959172711 &q=Auckland&days=7";
+		rest.getWeatherForecast(weatherUrl, session, username,handleWeatherInfoResponse);
 	}
 
-	// function handleWeatherInfoResponse(message){
-	// 	var weatherResponse = JSON.parse(message);
-	// 	var weatherList = weatherResponse.location;
-	// 	console.log("Location: %s----",weatherList);
+	function handleWeatherInfoResponse(message, session, username){
+		var weatherInfo = JSON.parse(message);
+		rest.getAppointments(url, session, username, weatherInfo, displayAppointmentsResponse);
+	}
 
-	// }
-	function handleAppointmentsResponse(message, session, username) {
+	function displayAppointmentsResponse(message, session, username, weatherInfo) {
 		// Parase JSON
 		var appointmentsResponse = JSON.parse(message);
-		console.log("-=-=%s-=-=-", appointmentsResponse[0]);
 		var allAppointmentCards = [];
 		var AppointmentNumber = 0;
+		var forecastDay = weatherInfo.forecast;
+		var forecastItems = [];	
+
+		//put 7 forecast itme  into forecast item set
+		for(var i = 0; i <7; i++){
+			var forecastItem = {};
+			forecastItem.date = forecastDay.forecastday[i].date;
+			forecastItem.temp = forecastDay.forecastday[i].day.avgtemp_c;
+			forecastItem.text = forecastDay.forecastday[i].day.condition.text;
+			
+			forecastItems.push(forecastItem);
+		}
 
 		for (var index in appointmentsResponse) {
 			var usernameReceived = appointmentsResponse[index].username;
             var branch = appointmentsResponse[index].branch;
 			var time = appointmentsResponse[index].time;
+			var temp, text;
+
 			//Convert the username to lower cases
-			console.log("username: %s branch: %s, time : %s", usernameReceived, branch, time);
 			if (username.toLowerCase() === usernameReceived.toLowerCase()&&checkDate(time)) {
+				//get weather info for selected date
+				for (var x in forecastItems){
+					if(time === forecastItems[x].date){
+						temp  = forecastItems[x].temp;
+						text = forecastItems[x].text;
+						break;
+					}
+				}
 				AppointmentNumber += 1;
 				if(checkIfWithinSevenDays(time)){
 					var appointmentCard = {
@@ -85,14 +101,9 @@ var url = 'http://contosobotnj.azurewebsites.net/tables/Appointments';
 								{
 									"separator": true,
 									"type": "TextBlock",
-									"text": "Seattle, WA",
+									"text": "AUCKLAND, NZ",
 									"size": "large",
-									"isSubtle": true
-								},
-								{
-									"type": "TextBlock",
-									"text": "September 18, 7:30 AM",
-									"spacing": "none"
+									"weight":"bolder"
 								},
 								{
 									"type": "ColumnSet",
@@ -102,20 +113,15 @@ var url = 'http://contosobotnj.azurewebsites.net/tables/Appointments';
 											"width": "auto",
 											"items": [
 												{
-													"type": "Image",
-													"url": "http://messagecardplayground.azurewebsites.net/assets/Mostly%20Cloudy-Square.png",
-													"size": "small"
-												}
-											]
-										},
-										{
-											"type": "Column",
-											"width": "auto",
-											"items": [
+													"type": "TextBlock",
+													"text": ""+temp+" °C",
+													"size": "medium",
+													"spacing": "none"
+												},
 												{
 													"type": "TextBlock",
-													"text": "42°C",
-													"size": "extraLarge",
+													"text": text,
+													"size": "medium",
 													"spacing": "none"
 												}]
 										}

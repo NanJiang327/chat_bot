@@ -5,12 +5,22 @@
 
 var request = require('request');
 
-exports.getAppointments= function getData(url, session, username, callback){
+exports.getAppointments= function getData(url, session, username, weatherInfo, callback){
     request.get(url, {'headers':{'ZUMO-API-VERSION': '2.0.0'}}, function(err,res,body){
         if(err){
             console.log(err);
         }else {
-            callback(body, username, session);
+            callback(body, session, username, weatherInfo);
+        }
+    });
+};
+
+exports.checkAppointmentsExist= function getData(url, session, username,branch,time,exist, callback){
+    request.get(url, {'headers':{'ZUMO-API-VERSION': '2.0.0'}}, function(err,res,body){
+        if(err){
+            console.log(err);
+        }else {
+            callback(body, session, username,branch,time, exist);
         }
     });
 };
@@ -63,12 +73,12 @@ exports.makeAppointment = function SendData(url, username, branch, time){
 };
 
 // Request weather data
-exports.getWeatherForecast = function getData(url,session, callback){
+exports.getWeatherForecast = function getData(url,session,username, callback){
     request.get(url, function(err,res,body){
         if(err){
             console.log(err);
         }else {
-            callback(body, session);
+            callback(body, session, username);
         }
     });
 }

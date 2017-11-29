@@ -11,7 +11,7 @@ var currency = require('./currencyCard');
 
 exports.startDialog = function (bot) {
 
-    var recognizer = new builder.LuisRecognizer('https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/b3af0d31-1a00-41dd-9849-e6a5c38bcbd5?subscription-key=6b1443a209db4491a09da29c00fcf5ea&verbose=true&timezoneOffset=0&q=');
+    var recognizer = new builder.LuisRecognizer(' 	https://southeastasia.api.cognitive.microsoft.com/luis/v2.0/apps/b3af0d31-1a00-41dd-9849-e6a5c38bcbd5?subscription-key=9fd8182381494d90b974ffd583aa1c7a&verbose=true&timezoneOffset=0&q=');
 
     bot.recognizer(recognizer);
 
@@ -62,7 +62,7 @@ exports.startDialog = function (bot) {
                     session.send('Deleting \'%s\'...', time.entity)
                     //Check data format and availability
                     if(checkDate(time,session)){;
-                        appointment.deleteAppointment(session,session.conversationData['username'],foodEntity.entity);
+                        appointment.deleteAppointment(session,session.conversationData['username']);
                     }
                 } else {
                      session.send("Sorry. No appiontment at this time.");
@@ -135,7 +135,6 @@ exports.startDialog = function (bot) {
 			}
 		},
         function (session, results){
-
             if (results.response) {
                 session.conversationData["username"] = results.response;
             }

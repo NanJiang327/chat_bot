@@ -9,7 +9,7 @@ var luis = require('./controller/Luis');
 
 // Set up Restify server
 var server = restify.createServer();
-server.listen(process.env.port || process.env.PORT || 3980, function(){
+server.listen(process.env.port || process.env.PORT || 3978, function(){
     console.log('%s server created - listening to %s',server.name, server.url);
 });
 
