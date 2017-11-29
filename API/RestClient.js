@@ -46,7 +46,7 @@ exports.checkAppointmentsExist= function getData(url, session, username,branch,t
 };
 
 
-exports.deleteAppointment = function deleteData(url,session, username , time, found, id, callback){
+exports.deleteAppointment = function deleteData(url,session, username , time, found, id){
     var options = { 
         url: url + "\\" + id,
         method: 'DELETE',
@@ -59,7 +59,6 @@ exports.deleteAppointment = function deleteData(url,session, username , time, fo
     request(options,function (err, res, body){
         if( !err && res.statusCode === 200){
             console.log(body);
-            callback(body,session,username, time, found);
         }else {
             console.log(err);
             console.log(res);

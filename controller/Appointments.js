@@ -32,7 +32,7 @@ exports.makeAppointment = function makeAppointment(session, username,branch,  ti
 //used to handle delete response
 function handleDeleteResponse(message,session,username, time, found, idFound){
 	if(found){
-		rest.deleteAppointment(url,session,username,time,found,idFound,handleDeleteResponse);
+		rest.deleteAppointment(url,session,username,time,found,idFound);
 		session.send("Hi, %s. Appointment at %s has been deleted", username, time);
 	}else{
 		session.send("Sorry, %s. you don't have an appointment at this day", username);

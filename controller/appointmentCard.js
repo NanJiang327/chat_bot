@@ -2,10 +2,14 @@
 * @Project name: MSA Contoso Chat Bot
 * @Author: Nan Jiang
 */
+
 var rest = require('../API/RestClient');
 var builder = require('botbuilder');
 var request = require('request');
 var url = 'http://contosobotnj.azurewebsites.net/tables/Appointments';
+
+	// used for unit test
+	//module.exports = checkDate;
 
 	exports.displayAppointments = function getAppointments(session, username){
 		var weatherUrl = "http://api.apixu.com/v1/forecast.json?key=4afdc4ed6cc64789bbd223959172711 &q=Auckland&days=7";
@@ -230,5 +234,3 @@ function checkIfWithinSevenDays(time){
 	} 
 }
 	
-// used for unit test
-module.exports = checkDate;
